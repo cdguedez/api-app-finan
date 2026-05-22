@@ -1,0 +1,34 @@
+# ── Dependencias (se instalan dentro del contenedor) ──────────────────────────
+node_modules
+
+# ── Compilación (se compila dentro del contenedor) ────────────────────────────
+dist
+
+# ── Variables de entorno ──────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+.git
+.gitignore
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ── Tests ─────────────────────────────────────────────────────────────────────
+coverage
+test
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+docker-compose*.yml
+Dockerfile*

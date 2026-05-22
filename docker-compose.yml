@@ -1,0 +1,31 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Docker Compose – Base de datos local
+#
+# Solo levanta PostgreSQL. La API corre directamente con yarn start:dev.
+#
+# Uso:
+#   docker compose up -d          # Levanta la BD en background
+#   docker compose down           # Para y elimina el contenedor
+#   docker compose down -v        # Borra también el volumen (datos)
+# ─────────────────────────────────────────────────────────────────────────────
+services:
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-apiapp}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-apiapp_secret}
+      POSTGRES_DB: ${DB_NAME:-apiapp_db}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-apiapp} -d ${DB_NAME:-apiapp_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

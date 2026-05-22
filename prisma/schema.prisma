@@ -1,0 +1,40 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Prisma Schema – api-app
+// Proveedor: PostgreSQL
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Modelo: User
+// Refleja la interfaz User del módulo auth.
+//  - id              → UUID generado por la BD (default: gen_random_uuid())
+//  - email           → único, siempre en minúsculas (enforced en servicio)
+//  - passwordHash    → hash bcrypt de la contraseña (nunca texto plano)
+//  - biometricToken  → token opaco generado en el cliente Expo y almacenado
+//                      en expo-secure-store; se envía para autenticación
+//                      biométrica sin revelar la contraseña.
+//  - createdAt       → timestamp de creación (automático)
+//  - updatedAt       → timestamp de última actualización (automático)
+// ─────────────────────────────────────────────────────────────────────────────
+model User {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName      String   @map("first_name") @db.VarChar(100)
+  lastName       String   @map("last_name") @db.VarChar(100)
+  email          String   @unique @db.VarChar(255)
+  passwordHash   String   @map("password_hash") @db.Text
+  /// Token biométrico registrado desde el dispositivo Expo.
+  /// Almacenado como hash en prod; aquí se guarda el valor opaco.
+  biometricToken String?  @map("biometric_token") @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
