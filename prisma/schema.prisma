@@ -33,8 +33,71 @@ model User {
   /// Token biométrico registrado desde el dispositivo Expo.
   /// Almacenado como hash en prod; aquí se guarda el valor opaco.
   biometricToken String?  @map("biometric_token") @db.Text
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  accounts       Account[]
+  categories     Category[]
 
   @@map("users")
+}
+
+enum Currency {
+  USD
+  VES
+  EUR
+  BTC
+  ETH
+  USDT
+}
+
+model Account {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String   @map("name") @db.VarChar(100)
+  currency  Currency @map("currency")
+  balance   Decimal  @default(0.00) @db.Decimal(15, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@map("accounts")
+}
+
+model Category {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String   @db.VarChar(100)
+  color     String   @db.VarChar(7)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@map("categories")
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model Transaction {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId   String          @map("account_id") @db.Uuid
+  categoryId  String?         @map("category_id") @db.Uuid
+  amount      Decimal         @db.Decimal(15, 2)
+  type        TransactionType
+  description String?         @db.Text
+  date        DateTime        @default(now())
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  account  Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@map("transactions")
 }
