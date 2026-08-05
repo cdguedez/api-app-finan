@@ -35,7 +35,7 @@ export class AuthService {
     const existing = await this.usersRepository.findByEmail(dto.email);
     if (existing) {
       throw new ConflictException(
-        'Error de autenticación, comuníquese con el administrador.',
+        'Error al registrar Usuario, comuníquese con el administrador.',
       );
     }
 
@@ -52,6 +52,7 @@ export class AuthService {
 
     return {
       accessToken,
+      userId: user.id,
       user: {
         firstName: user.firstName,
         lastName: user.lastName,
@@ -85,6 +86,7 @@ export class AuthService {
 
     return {
       accessToken,
+      userId: user.id,
       user: {
         firstName: user.firstName,
         lastName: user.lastName,
@@ -128,6 +130,7 @@ export class AuthService {
 
     return {
       accessToken,
+      userId: user.id,
       user: {
         firstName: user.firstName,
         lastName: user.lastName,

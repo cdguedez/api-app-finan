@@ -16,5 +16,6 @@ export interface JwtPayload {
 
 export interface AuthResponse {
   accessToken: string;
+  userId: string;
   user: Pick<User, 'firstName' | 'lastName'>;
 }
