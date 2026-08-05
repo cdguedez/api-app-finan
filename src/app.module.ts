@@ -8,6 +8,8 @@ import { IpLoggerMiddleware } from './common/middleware/ip-logger.middleware';
 import { AccountsModule } from './accounts/accounts.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { BudgetsModule } from './budgets/budgets.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { TransactionsModule } from './transactions/transactions.module';
     AccountsModule,
     CategoriesModule,
     TransactionsModule,
+    BudgetsModule,
+    SubscriptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
