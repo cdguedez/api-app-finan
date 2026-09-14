@@ -1,5 +1,15 @@
+export interface Role {
+  id: string;
+  name: string;
+  description?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface User {
   id: string;
+  roleId?: string | null;
+  role?: Role | null;
   firstName: string;
   lastName: string;
   email: string;
@@ -12,10 +22,15 @@ export interface User {
 export interface JwtPayload {
   sub: string;
   email: string;
+  role?: string;
 }
 
 export interface AuthResponse {
   accessToken: string;
   userId: string;
-  user: Pick<User, 'firstName' | 'lastName'>;
+  user: {
+    firstName: string;
+    lastName: string;
+    role?: string;
+  };
 }

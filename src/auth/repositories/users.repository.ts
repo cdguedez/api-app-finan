@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { User } from '../interfaces/auth.interfaces';
+import { User, Role } from '../interfaces/auth.interfaces';
 
 /**
  * Repositorio de usuarios respaldado por PostgreSQL vía Prisma.
@@ -15,18 +15,34 @@ export class UsersRepository {
   async findByEmail(email: string): Promise<User | undefined> {
     const user = await this.prisma.user.findUnique({
       where: { email: email.toLowerCase() },
+      include: { role: true },
     });
     if (!user) return undefined;
     return this.mapToUser(user);
   }
 
   async findById(id: string): Promise<User | undefined> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { role: true },
+    });
     if (!user) return undefined;
     return this.mapToUser(user);
   }
 
   async create(data: Omit<User, 'id' | 'createdAt'>): Promise<User> {
+    let roleId = data.roleId;
+
+    // Si no se especifica roleId, buscar el rol 'basic' por defecto
+    if (!roleId) {
+      const basicRole = await this.prisma.role.findUnique({
+        where: { name: 'basic' },
+      });
+      if (basicRole) {
+        roleId = basicRole.id;
+      }
+    }
+
     const user = await this.prisma.user.create({
       data: {
         firstName: data.firstName,
@@ -34,7 +50,9 @@ export class UsersRepository {
         email: data.email.toLowerCase(),
         passwordHash: data.passwordHash,
         biometricToken: data.biometricToken ?? null,
+        roleId: roleId ?? null,
       },
+      include: { role: true },
     });
     return this.mapToUser(user);
   }
@@ -47,6 +65,7 @@ export class UsersRepository {
       const user = await this.prisma.user.update({
         where: { id: userId },
         data: { biometricToken },
+        include: { role: true },
       });
       return this.mapToUser(user);
     } catch {
@@ -58,6 +77,7 @@ export class UsersRepository {
   async findByBiometricToken(token: string): Promise<User | undefined> {
     const user = await this.prisma.user.findFirst({
       where: { biometricToken: token },
+      include: { role: true },
     });
     if (!user) return undefined;
     return this.mapToUser(user);
@@ -66,6 +86,8 @@ export class UsersRepository {
   /** Mapea el modelo Prisma al contrato de la interfaz User del módulo auth */
   private mapToUser(p: {
     id: string;
+    roleId?: string | null;
+    role?: Role | null;
     firstName: string;
     lastName: string;
     email: string;
@@ -75,6 +97,16 @@ export class UsersRepository {
   }): User {
     return {
       id: p.id,
+      roleId: p.roleId,
+      role: p.role
+        ? {
+            id: p.role.id,
+            name: p.role.name,
+            description: p.role.description,
+            createdAt: p.role.createdAt,
+            updatedAt: p.role.updatedAt,
+          }
+        : null,
       firstName: p.firstName,
       lastName: p.lastName,
       email: p.email,

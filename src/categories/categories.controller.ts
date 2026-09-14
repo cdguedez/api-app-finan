@@ -20,35 +20,34 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  create(@Request() req, @Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.create(req.user.userId, createCategoryDto);
+  create(
+    @Request() req: { user: { id: string } },
+    @Body() createCategoryDto: CreateCategoryDto,
+  ) {
+    return this.categoriesService.create(req.user.id, createCategoryDto);
   }
 
   @Get()
-  findAll(@Request() req) {
-    return this.categoriesService.findAll(req.user.userId);
+  findAll(@Request() req: { user: { id: string } }) {
+    return this.categoriesService.findAll(req.user.id);
   }
 
   @Get(':id')
-  findOne(@Request() req, @Param('id') id: string) {
-    return this.categoriesService.findOne(req.user.userId, id);
+  findOne(@Request() req: { user: { id: string } }, @Param('id') id: string) {
+    return this.categoriesService.findOne(req.user.id, id);
   }
 
   @Patch(':id')
   update(
-    @Request() req,
+    @Request() req: { user: { id: string } },
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.categoriesService.update(
-      req.user.userId,
-      id,
-      updateCategoryDto,
-    );
+    return this.categoriesService.update(req.user.id, id, updateCategoryDto);
   }
 
   @Delete(':id')
-  remove(@Request() req, @Param('id') id: string) {
-    return this.categoriesService.remove(req.user.userId, id);
+  remove(@Request() req: { user: { id: string } }, @Param('id') id: string) {
+    return this.categoriesService.remove(req.user.id, id);
   }
 }
