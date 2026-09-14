@@ -1,20 +1,17 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Stage 1: deps – instala solo dependencias de producción
+# Stage 1: deps – instala todas las dependencias
 # ─────────────────────────────────────────────────────────────────────────────
 FROM node:20-alpine AS deps
 
 WORKDIR /app
 
-# Instala yarn (viene incluido en node:20-alpine, pero lo fijamos)
-RUN corepack enable && corepack prepare yarn@stable --activate
-
 COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
-RUN yarn install --frozen-lockfile --production=false
+RUN yarn install --frozen-lockfile
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Stage 2: builder – compila TypeScript
+# Stage 2: builder – compila TypeScript y genera Prisma Client
 # ─────────────────────────────────────────────────────────────────────────────
 FROM deps AS builder
 
@@ -35,14 +32,12 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-RUN corepack enable && corepack prepare yarn@stable --activate
-
 # Solo copiamos lo estrictamente necesario
 COPY package.json yarn.lock ./
 COPY prisma ./prisma/
 
 # Instala únicamente dependencias de producción
-RUN yarn install --frozen-lockfile --production=true
+RUN yarn install --frozen-lockfile --production
 
 # Copia el cliente Prisma generado y el bundle compilado
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
