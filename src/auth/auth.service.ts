@@ -56,6 +56,7 @@ export class AuthService {
       user: {
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role?.name ?? 'basic',
       },
     };
   }
@@ -90,6 +91,7 @@ export class AuthService {
       user: {
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role?.name ?? 'basic',
       },
     };
   }
@@ -134,6 +136,7 @@ export class AuthService {
       user: {
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role?.name ?? 'basic',
       },
     };
   }
@@ -170,10 +173,12 @@ export class AuthService {
     email: string;
     firstName: string;
     lastName: string;
+    role?: { name: string } | null;
   }): string {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
+      role: user.role?.name ?? 'basic',
     };
     return this.jwtService.sign(payload);
   }

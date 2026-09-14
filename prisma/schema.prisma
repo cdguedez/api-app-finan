@@ -13,9 +13,30 @@ datasource db {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Modelo: Role
+//  - id          → UUID generado por la BD (default: gen_random_uuid())
+//  - name        → único ("basic", "admin")
+//  - description → descripción opcional del rol
+//  - createdAt   → timestamp de creación (automático)
+//  - updatedAt   → timestamp de última actualización (automático)
+// ─────────────────────────────────────────────────────────────────────────────
+model Role {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @unique @db.VarChar(50)
+  description String?  @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("roles")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Modelo: User
 // Refleja la interfaz User del módulo auth.
 //  - id              → UUID generado por la BD (default: gen_random_uuid())
+//  - roleId          → UUID de relación con la tabla roles
 //  - email           → único, siempre en minúsculas (enforced en servicio)
 //  - passwordHash    → hash bcrypt de la contraseña (nunca texto plano)
 //  - biometricToken  → token opaco generado en el cliente Expo y almacenado
@@ -26,6 +47,8 @@ datasource db {
 // ─────────────────────────────────────────────────────────────────────────────
 model User {
   id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  roleId         String?  @map("role_id") @db.Uuid
+  role           Role?    @relation(fields: [roleId], references: [id], onDelete: SetNull)
   firstName      String   @map("first_name") @db.VarChar(100)
   lastName       String   @map("last_name") @db.VarChar(100)
   email          String   @unique @db.VarChar(255)
