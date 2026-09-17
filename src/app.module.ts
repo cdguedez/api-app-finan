@@ -10,6 +10,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { BanksModule } from './banks/banks.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     TransactionsModule,
     BudgetsModule,
     SubscriptionsModule,
+    BanksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
